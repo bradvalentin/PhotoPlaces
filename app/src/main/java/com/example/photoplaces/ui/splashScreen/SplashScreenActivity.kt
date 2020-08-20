@@ -3,13 +3,12 @@ package com.example.photoplaces.ui.splashScreen
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import androidx.constraintlayout.motion.widget.MotionLayout
 import com.example.photoplaces.R
+import com.example.photoplaces.ui.places.PlacesListActivity
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 
 class SplashScreenActivity : AppCompatActivity() {
-    private val handler: Handler by lazy {  Handler() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +28,9 @@ class SplashScreenActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         motionLayout.startLayoutAnimation()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        handler.removeCallbacksAndMessages(null)
-        finish()
     }
 
 }

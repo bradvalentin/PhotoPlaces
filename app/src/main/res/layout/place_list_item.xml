@@ -1,91 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardViewRepo"
-    android:layout_width="160dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginEnd="8dp"
-    android:layout_marginBottom="4dp"
-    android:foreground="?android:attr/selectableItemBackground"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/repoConstraintLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="0dp"
-        android:background="@color/colorGreyLight">
+<layout>
 
-        <ImageView
-            android:id="@+id/placeImageView"
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="place"
+            type="com.example.photoplaces.data.entity.Place" />
+
+        <variable
+            name="listener"
+            type="com.example.photoplaces.ui.places.PlaceItemClickListener" />
+
+    </data>
+
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cardViewRepo"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        android:onClick='@{() -> listener.placeItemPressed(place)}'
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/repoConstraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:scaleType="fitXY"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="0dp"
+            android:background="@color/colorGreenLight">
 
-        <TextView
-            android:id="@+id/placeAddressTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:text="Address"
-            android:textColor="@color/colorGreyDark"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/placeImageView" />
+            <ImageView
+                android:id="@+id/placeImageView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:scaleType="fitXY"
+                android:imageUrl="@{place.image}"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/placeAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="8dp"
-            android:textSize="12sp"
-            android:maxLines="2"
-            android:text="Traian Vuia"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/placeAddressTitle" />
+            <TextView
+                android:id="@+id/placeAddressTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/address_text"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/placeImageView" />
 
-        <TextView
-            android:id="@+id/placeDistanceTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:textSize="14sp"
-            android:textColor="@color/colorGreyDark"
-            android:text="Distance"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/placeAddress" />
+            <TextView
+                android:id="@+id/placeAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="8dp"
+                android:maxLines="2"
+                android:textColor="@color/colorGreyDark"
+                android:text="@{place.address}"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/placeAddressTitle" />
 
-        <TextView
-            android:id="@+id/placeDistance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:textSize="12sp"
-            android:maxLines="2"
-            android:text="2.2 km"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/placeDistanceTitle" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/placeDistanceTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/distance_text"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/placeAddress" />
 
-</androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/placeDistance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                android:maxLines="2"
+                android:textColor="@color/colorGreyDark"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/placeDistanceTitle" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>

@@ -9,11 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.PlacesListActivity">
+        <activity android:name=".ui.places.PlacesListActivity">
 
         </activity>
         <activity
-            android:name=".ui.SplashScreenActivity"
+            android:name=".ui.splashScreen.SplashScreenActivity"
             android:noHistory="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

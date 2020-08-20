@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -22,6 +23,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    dataBinding {
+        enabled = true
+    }
+
+    androidExtensions {
+        experimental = true
+    }
 }
 
 dependencies {
@@ -35,6 +44,12 @@ dependencies {
 
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
 
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
+
+    // Skeleton
+    implementation 'com.faltenreich:skeletonlayout:2.0.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

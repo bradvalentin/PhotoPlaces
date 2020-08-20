@@ -1,4 +1,4 @@
-package com.example.photoplaces.ui
+package com.example.photoplaces.ui.splashScreen
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

@@ -20,5 +20,12 @@
         <item name="android:windowEnterAnimation">@anim/fade</item>
     </style>
 
+    <style name="MtButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/YellowButtonThemeOverlay</item>
+    </style>
+
+    <style name="YellowButtonThemeOverlay">
+        <item name="colorPrimary">@color/colorAccent</item>
+    </style>
 
 </resources>

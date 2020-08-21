@@ -10,6 +10,7 @@ import com.example.photoplaces.data.network.RemoteDataSourceInterfaceImpl
 import com.example.photoplaces.data.network.api.PlacesApiService
 import com.example.photoplaces.data.repository.PlacesRepository
 import com.example.photoplaces.data.repository.PlacesRepositoryImpl
+import com.example.photoplaces.ui.places.PlacesViewModelFactory
 import com.example.photoplaces.utils.Constants
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
@@ -92,6 +93,14 @@ val networkDataSource = module {
     }
 
     single { provideNetworkDataSource(get()) }
+}
+
+val factoryModule = module {
+    fun providePlacesViewModelFactory(placesRepository: PlacesRepository): PlacesViewModelFactory {
+        return PlacesViewModelFactory(placesRepository)
+    }
+
+    factory { providePlacesViewModelFactory(get()) }
 }
 
 val repositoryModule = module {

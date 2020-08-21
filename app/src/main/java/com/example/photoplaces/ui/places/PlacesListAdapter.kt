@@ -8,7 +8,7 @@ import com.example.photoplaces.R
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.databinding.PlaceListItemBinding
 
-class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListener, var places: MutableList<Place>) : RecyclerView.Adapter<PlacesListAdapter.PlacesViewHolder>() {
+class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListener, var places: ArrayList<Place>) : RecyclerView.Adapter<PlacesListAdapter.PlacesViewHolder>() {
 
     class PlacesViewHolder(val view: PlaceListItemBinding) : RecyclerView.ViewHolder(view.root)
 

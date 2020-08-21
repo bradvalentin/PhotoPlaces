@@ -1,13 +1,17 @@
 package com.example.photoplaces.data.entity
 
 import android.os.Parcelable
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Place(
-    val address: String,
-    val image: String?,
-    val label: String,
-    val lat: Double,
-    val lng: Double
-): Parcelable
+open class Place(
+    @PrimaryKey
+    var id: Int = 0,
+    var address: String = "",
+    var image: String? = null,
+    var label: String = "",
+    var lat: Double = 0.0,
+    var lng: Double = 0.0
+): Parcelable, RealmObject()

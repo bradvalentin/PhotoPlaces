@@ -1,29 +1,49 @@
 package com.example.photoplaces.data.repository
 
 import androidx.lifecycle.LiveData
+import com.example.photoplaces.data.db.PlacesDao
+import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.data.network.RemoteDataSourceInterface
+import com.example.photoplaces.data.network.response.PlacesApiResponse
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PlacesRepositoryImpl(
-    private val remoteDataSourceInterface: RemoteDataSourceInterface
+    private val remoteDataSourceInterface: RemoteDataSourceInterface,
+    private val placesDao: PlacesDao
 ) : PlacesRepository {
 
     init {
-        remoteDataSourceInterface.downloadedPlaces.observeForever { places ->
+        remoteDataSourceInterface.downloadedPlaces.observeForever { placesResponse ->
+            persistFetchedPlaces(placesResponse)
         }
     }
 
-    override suspend fun fetchAllPlaces() {
-        return withContext(Dispatchers.IO) { initWeatherData() }
+    private fun persistFetchedPlaces(placesResponse: PlacesApiResponse) {
+        GlobalScope.launch(Dispatchers.IO) {
+            if (placesResponse.status == "ok" && placesResponse.locations.isNotEmpty()) {
+                placesDao.addAllPlaces(placesResponse.locations)
+            }
+        }
+    }
+
+    override suspend fun fetchAllPlaces(): LiveData<List<Place>> {
+        return withContext(Dispatchers.Main) {
+            initPlacesData()
+            placesDao.fetchAllPlaces()
+        }
     }
 
     override suspend fun downloadingStatus(): LiveData<Boolean> {
         return withContext(Dispatchers.IO) { remoteDataSourceInterface.downloading }
     }
 
-    private suspend fun initWeatherData() {
-        remoteDataSourceInterface.fetchAllPlaces()
+    private suspend fun initPlacesData() {
+        if (placesDao.isDatabaseEmpty()) {
+            remoteDataSourceInterface.fetchAllPlaces()
+        }
     }
 
 }

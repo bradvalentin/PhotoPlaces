@@ -1,6 +1,8 @@
 package com.example.photoplaces.di
 
 import android.app.Application
+import com.example.photoplaces.data.db.PlacesDao
+import com.example.photoplaces.data.db.PlacesDaoImpl
 import com.example.photoplaces.data.network.ConnectivityInterceptor
 import com.example.photoplaces.data.network.ConnectivityInterceptorImpl
 import com.example.photoplaces.data.network.RemoteDataSourceInterface
@@ -30,11 +32,11 @@ val connInterceptorModule = module {
 }
 
 val apiModule = module {
-    fun provideWeatherApi(retrofit: Retrofit): PlacesApiService {
+    fun providePlacesApi(retrofit: Retrofit): PlacesApiService {
         return retrofit.create(PlacesApiService::class.java)
     }
 
-    single { provideWeatherApi(get()) }
+    single { providePlacesApi(get()) }
 }
 
 val netModule = module {
@@ -63,13 +65,15 @@ val netModule = module {
     }
 
     fun provideGson(): Gson {
-        return GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create()
+        return GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create()
     }
 
     fun provideRetrofit(factory: Gson, client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(
-                Constants.API_BASE_URL)
+                Constants.API_BASE_URL
+            )
             .addConverterFactory(GsonConverterFactory.create(factory))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(client)
@@ -91,10 +95,22 @@ val networkDataSource = module {
 }
 
 val repositoryModule = module {
-    fun provideForecastRepository(remoteDataSource: RemoteDataSourceInterface): PlacesRepository {
-        return PlacesRepositoryImpl(remoteDataSource)
+    fun providePlacesRepository(
+        remoteDataSource: RemoteDataSourceInterface,
+        placesDao: PlacesDao
+    ): PlacesRepository {
+        return PlacesRepositoryImpl(remoteDataSource, placesDao)
     }
 
-    single { provideForecastRepository(get()) }
+    single { providePlacesRepository(get(), get()) }
+}
+
+val databaseModule = module {
+
+    fun providePlacesDao(): PlacesDao {
+        return PlacesDaoImpl()
+    }
+
+    factory { providePlacesDao() }
 }
 

@@ -9,7 +9,7 @@ import com.example.photoplaces.utils.NoConnectivityException
 
 class RemoteDataSourceInterfaceImpl(
     private val placesApiService: PlacesApiService
-): RemoteDataSourceInterface {
+) : RemoteDataSourceInterface {
 
     private val _downloadedPlaces = MutableLiveData<PlacesApiResponse>()
     override val downloadedPlaces: LiveData<PlacesApiResponse>
@@ -20,13 +20,13 @@ class RemoteDataSourceInterfaceImpl(
         get() = _downloading
 
     override suspend fun fetchAllPlaces() {
-        try{
-            val fetchedCurrentWeather = placesApiService.fetchAllPlaces()
+        try {
+            val fetchedPlaces = placesApiService.fetchAllPlaces()
 
-            _downloadedPlaces.postValue(fetchedCurrentWeather.body())
+            _downloadedPlaces.postValue(fetchedPlaces.body())
             _downloading.postValue(true)
 
-        }catch (e: NoConnectivityException){
+        } catch (e: NoConnectivityException) {
             Log.e("Connection", "No internet", e)
             _downloading.postValue(false)
 

@@ -3,12 +3,14 @@ package com.example.photoplaces.utils
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.example.photoplaces.R
 
 fun ImageView.loadImageFromUrl(url: String?) {
     val options = RequestOptions()
         .placeholder(R.drawable.no_image)
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
         .error(R.drawable.no_image)
 
     Glide.with(context)

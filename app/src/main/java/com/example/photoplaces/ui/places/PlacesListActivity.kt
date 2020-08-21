@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.widget.Toast
 import com.example.photoplaces.R
 import com.example.photoplaces.data.entity.Place
+import com.example.photoplaces.data.repository.PlacesRepository
 import com.example.photoplaces.utils.CarouselSnapHelper
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import kotlinx.android.synthetic.main.activity_places_list.*
+import org.koin.android.ext.android.inject
 
 class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
@@ -28,6 +30,9 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
         Place("adr", "", "home", 2.2, 3.3),
         Place("adr", "", "home", 2.2, 3.3),
         Place("adr", "", "home", 2.2, 3.3))}
+
+    private val placesRepository: PlacesRepository by inject()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

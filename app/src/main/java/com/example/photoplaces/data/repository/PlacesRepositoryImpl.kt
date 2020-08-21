@@ -12,8 +12,7 @@ import kotlinx.coroutines.withContext
 
 class PlacesRepositoryImpl(
     private val remoteDataSourceInterface: RemoteDataSourceInterface,
-    private val placesDao: PlacesDao
-) : PlacesRepository {
+    private val placesDao: PlacesDao) : PlacesRepository {
 
     init {
         remoteDataSourceInterface.downloadedPlaces.observeForever { placesResponse ->

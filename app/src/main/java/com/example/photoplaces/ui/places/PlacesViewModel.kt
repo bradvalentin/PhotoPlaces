@@ -2,6 +2,7 @@ package com.example.photoplaces.ui.places
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.example.photoplaces.data.entity.CurrentLocation
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.data.repository.PlacesRepository
 
@@ -16,5 +17,4 @@ class PlacesViewModel(
     suspend fun getDownloadingStatus(): LiveData<Boolean> {
         return placesRepository.downloadingStatus()
     }
-
 }

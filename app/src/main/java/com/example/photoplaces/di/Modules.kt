@@ -122,4 +122,3 @@ val databaseModule = module {
 
     factory { providePlacesDao() }
 }
-

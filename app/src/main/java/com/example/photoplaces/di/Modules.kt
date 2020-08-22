@@ -1,6 +1,7 @@
 package com.example.photoplaces.di
 
 import android.app.Application
+import android.content.Context
 import com.example.photoplaces.data.db.PlacesDao
 import com.example.photoplaces.data.db.PlacesDaoImpl
 import com.example.photoplaces.data.network.ConnectivityInterceptor
@@ -8,6 +9,8 @@ import com.example.photoplaces.data.network.ConnectivityInterceptorImpl
 import com.example.photoplaces.data.network.RemoteDataSourceInterface
 import com.example.photoplaces.data.network.RemoteDataSourceInterfaceImpl
 import com.example.photoplaces.data.network.api.PlacesApiService
+import com.example.photoplaces.data.provider.DistanceProvider
+import com.example.photoplaces.data.provider.DistanceProviderImpl
 import com.example.photoplaces.data.repository.PlacesRepository
 import com.example.photoplaces.data.repository.PlacesRepositoryImpl
 import com.example.photoplaces.ui.places.PlacesViewModelFactory
@@ -121,4 +124,12 @@ val databaseModule = module {
     }
 
     factory { providePlacesDao() }
+}
+
+val distanceProviderModule = module {
+    fun provideDistanceProvider(): DistanceProvider {
+        return DistanceProviderImpl()
+    }
+
+    single { provideDistanceProvider() }
 }

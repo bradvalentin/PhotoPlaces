@@ -6,5 +6,8 @@
     <string name="unknown_text">unknown</string>
     <string name="no_internet_text">No internet connection. Please check your device connection settings.</string>
     <string name="activate_location_text">Please activate location from settings.</string>
+    <string name="latitude_and_longitude_text">Latitude and Longitude</string>
+    <string name="location">%1$s, %2$s</string>
+
 
 </resources>

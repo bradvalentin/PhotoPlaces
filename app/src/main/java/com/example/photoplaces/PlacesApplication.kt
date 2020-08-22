@@ -19,7 +19,8 @@ class PlacesApplication : Application() {
                 networkDataSource,
                 repositoryModule,
                 factoryModule,
-                databaseModule
+                databaseModule,
+                distanceProviderModule
             )
         )
     }

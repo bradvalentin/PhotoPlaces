@@ -4,19 +4,22 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.example.photoplaces.R
+import com.example.photoplaces.utils.Constants.FADE_ANIMATION_DURATION
 import java.text.DecimalFormat
 
 fun ImageView.loadImageFromUrl(url: String?) {
     val options = RequestOptions()
-        .placeholder(R.drawable.no_image)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .error(R.drawable.no_image)
+
 
     Glide.with(context)
         .setDefaultRequestOptions(options)
         .load(url)
+        .transition(DrawableTransitionOptions.withCrossFade(FADE_ANIMATION_DURATION))
         .into(this)
 }
 

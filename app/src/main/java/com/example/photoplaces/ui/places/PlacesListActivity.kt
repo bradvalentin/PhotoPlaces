@@ -1,12 +1,13 @@
 package com.example.photoplaces.ui.places
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,7 +15,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.photoplaces.R
 import com.example.photoplaces.data.entity.CurrentLocation
 import com.example.photoplaces.data.entity.Place
+import com.example.photoplaces.data.provider.DistanceProvider
 import com.example.photoplaces.data.provider.LocationViewModel
+import com.example.photoplaces.ui.placeDetails.PlaceDetailsActivity
 import com.example.photoplaces.utils.CarouselSnapHelper
 import com.example.photoplaces.utils.Constants.PERMISSION_RESULT_CODE
 import com.example.photoplaces.utils.formatToKm
@@ -32,6 +35,8 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     private val viewModelFactory: PlacesViewModelFactory by inject()
     private lateinit var viewModel: PlacesViewModel
     private lateinit var locationViewModel: LocationViewModel
+
+    private val distanceProvider: DistanceProvider by inject()
 
     private val placesAdapter: PlacesListAdapter by lazy {
         PlacesListAdapter(this, places)
@@ -73,20 +78,9 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     private fun calculateDistance(location: CurrentLocation) {
 
         places.forEachIndexed { index, place ->
-            val locationA = Location("pointA")
-            locationA.apply {
-                latitude = place.lat
-                longitude = place.lng
-            }
-            val locationB = Location("pointB")
-            locationB.apply {
-                latitude = location.latitude
-                longitude = location.longitude
-            }
-            val distance = locationA.distanceTo(locationB)
+            val distance = distanceProvider.distanceBetweenTwoLocations(place, location)
             place.distance = distance.formatToKm(2)
             placesAdapter.notifyItemChanged(index, Unit)
-
         }
     }
 
@@ -157,7 +151,10 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     }
 
     override fun placeItemPressed(place: Place) {
-        Toast.makeText(this, place.address, Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, PlaceDetailsActivity::class.java)
+        intent.putExtra("place", place)
+        startActivity(intent)
+        overridePendingTransition(0, R.anim.fade_out);
     }
 
 }

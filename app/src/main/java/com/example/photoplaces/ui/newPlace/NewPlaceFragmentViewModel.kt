@@ -90,7 +90,7 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
         }
     }
 
-    fun insertOrUpdate() {
+    fun insertOrUpdate(placeId: String?) {
 
         addressLiveData.value?.let { address ->
             labelLiveData.value?.let { label ->
@@ -98,6 +98,9 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
                     longitudeLiveData.value?.let { longitude ->
                         val place = Place()
                         place.apply {
+                            placeId?.let {
+                                id = it
+                            }
                             this.address = address
                             image = imageUrlLiveData.value
                             this.label = label

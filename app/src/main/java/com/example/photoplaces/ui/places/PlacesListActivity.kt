@@ -1,6 +1,7 @@
 package com.example.photoplaces.ui.places
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.example.photoplaces.data.provider.LocationViewModel
 import com.example.photoplaces.ui.newPlace.NewPlaceFragment
 import com.example.photoplaces.ui.placeDetails.PlaceDetailsActivity
 import com.example.photoplaces.utils.CarouselSnapHelper
+import com.example.photoplaces.utils.Constants.ACTIVITY_REQUEST_CODE
 import com.example.photoplaces.utils.Constants.PERMISSION_RESULT_CODE
 import com.example.photoplaces.utils.formatToKm
 import com.faltenreich.skeletonlayout.Skeleton
@@ -40,7 +42,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     private val distanceProvider: DistanceProvider by inject()
 
     private val placesAdapter: PlacesListAdapter by lazy {
-        PlacesListAdapter(this, places)
+        PlacesListAdapter(this)
     }
     private val snapHelper: CarouselSnapHelper by lazy { CarouselSnapHelper() }
     private val skeleton: Skeleton by lazy {
@@ -50,7 +52,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
         )
     }
 
-    private val places: ArrayList<Place> by lazy { arrayListOf<Place>() }
+    private var position: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,7 +83,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
     private fun calculateDistance(location: CurrentLocation) {
 
-        places.forEachIndexed { index, place ->
+        placesAdapter.places.forEachIndexed { index, place ->
             val distance = distanceProvider.distanceBetweenTwoLocations(place, location)
             place.distance = distance.formatToKm(2)
             placesAdapter.notifyItemChanged(index, Unit)
@@ -151,16 +153,30 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     }
 
     private fun updatePlacesList(location: List<Place>) {
-        places.addAll(location)
         placesAdapter.setDataSource(location)
         skeleton.showOriginal()
     }
 
-    override fun placeItemPressed(place: Place) {
+    override fun placeItemPressed(place: Place, position: Int) {
         val intent = Intent(this, PlaceDetailsActivity::class.java)
         intent.putExtra("place", place)
-        startActivity(intent)
-        overridePendingTransition(0, R.anim.fade_out);
+        startActivityForResult(intent, ACTIVITY_REQUEST_CODE)
+        overridePendingTransition(0, R.anim.fade_out)
+        this.position = position
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == ACTIVITY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                val place = data?.getParcelableExtra<Place>("newPlace")
+                place?.let {
+                    placesAdapter.places[position] = place
+                    placesAdapter.notifyItemChanged(position)
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+
     }
 
     private fun showDialog() {

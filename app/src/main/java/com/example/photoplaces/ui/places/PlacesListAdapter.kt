@@ -10,7 +10,9 @@ import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.databinding.PlaceListItemBinding
 import com.example.photoplaces.utils.PlaceDiffCallback
 
-class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListener, var places: List<Place>) : RecyclerView.Adapter<PlacesListAdapter.PlacesViewHolder>() {
+class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListener) : RecyclerView.Adapter<PlacesListAdapter.PlacesViewHolder>() {
+
+    var places: ArrayList<Place> = arrayListOf()
 
     class PlacesViewHolder(val view: PlaceListItemBinding) : RecyclerView.ViewHolder(view.root)
 
@@ -19,7 +21,7 @@ class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListen
         val oldList = places
         dataSource?.let {ds ->
             val diffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(PlaceDiffCallback(oldList, ds))
-            places = ds
+            places = ArrayList(ds)
             diffResult.dispatchUpdatesTo(this)
         }
     }
@@ -34,6 +36,7 @@ class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListen
     override fun onBindViewHolder(holder: PlacesViewHolder, position: Int) {
         holder.view.place = places[position]
         holder.view.listener = placeItemClickListener
+        holder.view.position = position
     }
 
     override fun getItemId(index: Int): Long {

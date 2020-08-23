@@ -3,5 +3,5 @@ package com.example.photoplaces.ui.places
 import com.example.photoplaces.data.entity.Place
 
 interface PlaceItemClickListener {
-    fun placeItemPressed(place: Place)
+    fun placeItemPressed(place: Place, position: Int)
 }

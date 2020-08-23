@@ -81,9 +81,9 @@
                     android:layout_marginTop="2dp"
                     android:layout_marginEnd="12dp"
                     android:maxLines="2"
-                    android:textIsSelectable="true"
                     android:text="@{place.address}"
                     android:textColor="@color/colorGreyDark"
+                    android:textIsSelectable="true"
                     android:textSize="16sp" />
 
                 <TextView
@@ -105,13 +105,14 @@
                     android:layout_marginEnd="12dp"
                     android:layout_marginBottom="16dp"
                     android:maxLines="2"
-                    android:textIsSelectable="true"
                     android:text="@{@string/location(place.lat, place.lng)}"
                     android:textColor="@color/colorGreyDark"
+                    android:textIsSelectable="true"
                     android:textSize="16sp" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
+
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/editButton"
@@ -124,6 +125,11 @@
             app:layout_anchorGravity="bottom|end|right"
             app:maxImageSize="28dp" />
 
+        <FrameLayout
+            android:id="@+id/fragmentHolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

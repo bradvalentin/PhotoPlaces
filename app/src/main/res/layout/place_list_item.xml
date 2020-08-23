@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
+        <variable
+            name="position"
+            type="int"/>
 
         <variable
             name="place"
@@ -14,8 +19,7 @@
 
     </data>
 
-    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.cardview.widget.CardView
         android:id="@+id/cardViewRepo"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
@@ -26,7 +30,7 @@
         android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
-        android:onClick='@{() -> listener.placeItemPressed(place)}'
+        android:onClick='@{() -> listener.placeItemPressed(place, position)}'
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -95,7 +99,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 android:maxLines="2"
                 android:text="@{place.distance ?? @string/unknown_text}"
                 android:textColor="@color/colorGreyDark"
@@ -103,7 +107,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/placeDistanceTitle" />
+                app:layout_constraintTop_toBottomOf="@+id/placeDistanceTitle"
+                app:layout_constraintVertical_bias="0.0" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

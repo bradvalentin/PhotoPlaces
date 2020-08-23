@@ -12,10 +12,12 @@ class RealmLiveData<T : RealmModel>(private val results: RealmResults<T>) :
         RealmChangeListener { results -> value = results }
 
     override fun onActive() {
+        super.onActive()
         results.addChangeListener(listener)
     }
 
     override fun onInactive() {
+        super.onInactive()
         results.removeChangeListener(listener)
     }
 }

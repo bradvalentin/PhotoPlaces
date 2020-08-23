@@ -1,7 +1,6 @@
 package com.example.photoplaces.di
 
 import android.app.Application
-import android.content.Context
 import com.example.photoplaces.data.db.PlacesDao
 import com.example.photoplaces.data.db.PlacesDaoImpl
 import com.example.photoplaces.data.network.ConnectivityInterceptor
@@ -13,6 +12,7 @@ import com.example.photoplaces.data.provider.DistanceProvider
 import com.example.photoplaces.data.provider.DistanceProviderImpl
 import com.example.photoplaces.data.repository.PlacesRepository
 import com.example.photoplaces.data.repository.PlacesRepositoryImpl
+import com.example.photoplaces.ui.newPlace.NewPlaceFragmentViewModelFactory
 import com.example.photoplaces.ui.places.PlacesViewModelFactory
 import com.example.photoplaces.utils.Constants
 import com.google.gson.FieldNamingPolicy
@@ -103,7 +103,14 @@ val factoryModule = module {
         return PlacesViewModelFactory(placesRepository)
     }
 
+    fun provideNewPlaceFragmentViewModelFactory(placesRepository: PlacesRepository): NewPlaceFragmentViewModelFactory {
+        return NewPlaceFragmentViewModelFactory(
+            placesRepository
+        )
+    }
     factory { providePlacesViewModelFactory(get()) }
+
+    factory { provideNewPlaceFragmentViewModelFactory(get()) }
 }
 
 val repositoryModule = module {

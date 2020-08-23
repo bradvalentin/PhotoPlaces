@@ -8,6 +8,14 @@
     <string name="activate_location_text">Please activate location from settings.</string>
     <string name="latitude_and_longitude_text">Latitude and Longitude</string>
     <string name="location">%1$s, %2$s</string>
+    <string name="longitude_text">Longitude</string>
+    <string name="latitude_text">Latitude</string>
+    <string name="image_url_text">Image url</string>
+    <string name="label_text">Label</string>
+    <string name="save_button_text">Save</string>
+    <string name="fail_to_save_text">Fail to save</string>
+    <string name="latitude_range_text">Latitudes range from -90 to 90</string>
+    <string name="longitude_range_text">Longitudes range from -180 to 80</string>
 
 
 </resources>

@@ -3,22 +3,24 @@ package com.example.photoplaces.ui.places
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photoplaces.R
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.databinding.PlaceListItemBinding
+import com.example.photoplaces.utils.PlaceDiffCallback
 
-class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListener, var places: ArrayList<Place>) : RecyclerView.Adapter<PlacesListAdapter.PlacesViewHolder>() {
+class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListener, var places: List<Place>) : RecyclerView.Adapter<PlacesListAdapter.PlacesViewHolder>() {
 
     class PlacesViewHolder(val view: PlaceListItemBinding) : RecyclerView.ViewHolder(view.root)
 
     fun setDataSource(dataSource: List<Place>?) {
-        dataSource?.let {ds ->
-            val pos = places.size
-            val count = ds.size
-            places.addAll(ds)
 
-            notifyItemRangeInserted(pos, count)
+        val oldList = places
+        dataSource?.let {ds ->
+            val diffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(PlaceDiffCallback(oldList, ds))
+            places = ds
+            diffResult.dispatchUpdatesTo(this)
         }
     }
 

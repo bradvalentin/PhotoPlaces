@@ -1,6 +1,7 @@
 package com.example.photoplaces.data.db
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.utils.asLiveData
@@ -8,19 +9,12 @@ import io.realm.Realm
 
 class PlacesDaoImpl : PlacesDao {
 
-    var num = 0
-    private fun setUniqueId(): Int {
-        num += 1
-        return num
-    }
-
     override fun addAllPlaces(places: List<Place>): Boolean {
+
+        val realm = Realm.getDefaultInstance()
+
         return try {
-            places.forEach {
-                it.id = setUniqueId()
-            }
-            val realm = Realm.getDefaultInstance()
-            realm.executeTransaction {
+            realm.executeTransactionAsync {
                 it.insertOrUpdate(places)
             }
             realm.close()
@@ -32,19 +26,37 @@ class PlacesDaoImpl : PlacesDao {
     }
 
     override fun fetchAllPlaces(): LiveData<List<Place>> {
-        val realm = Realm.getDefaultInstance()
-        val realmLiveData  = realm.where(Place::class.java).findAllAsync().asLiveData()
 
-        return Transformations.map(realmLiveData) { realmResult ->
-            val placesCopy = realm.copyFromRealm(realmResult)
-            realm.close()
-            placesCopy
-        }
+        val realm = Realm.getDefaultInstance()
+            val realmLiveData = realm.where(Place::class.java).findAllAsync().asLiveData()
+
+            return Transformations.map(realmLiveData) { realmResult ->
+                realm.copyFromRealm(realmResult)
+            }
     }
 
     override fun isDatabaseEmpty(): Boolean {
         val realm = Realm.getDefaultInstance()
-        return realm.isEmpty
+        val isEmpty = realm.isEmpty
+        realm.close()
+        return isEmpty
+    }
+
+    override fun insertOrUpdatePlace(place: Place): Place? {
+
+        val realm = Realm.getDefaultInstance()
+
+        return try {
+            realm.executeTransactionAsync {
+                it.copyToRealmOrUpdate(place)
+            }
+            realm.close()
+            place
+        } catch (e: Exception) {
+            println(e)
+            null
+        }
+
     }
 
 }

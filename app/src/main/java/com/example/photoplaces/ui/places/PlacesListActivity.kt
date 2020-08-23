@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +16,7 @@ import com.example.photoplaces.data.entity.CurrentLocation
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.data.provider.DistanceProvider
 import com.example.photoplaces.data.provider.LocationViewModel
+import com.example.photoplaces.ui.newPlace.NewPlaceFragment
 import com.example.photoplaces.ui.placeDetails.PlaceDetailsActivity
 import com.example.photoplaces.utils.CarouselSnapHelper
 import com.example.photoplaces.utils.Constants.PERMISSION_RESULT_CODE
@@ -33,6 +33,7 @@ import org.koin.android.ext.android.inject
 class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
     private val viewModelFactory: PlacesViewModelFactory by inject()
+
     private lateinit var viewModel: PlacesViewModel
     private lateinit var locationViewModel: LocationViewModel
 
@@ -50,7 +51,6 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     }
 
     private val places: ArrayList<Place> by lazy { arrayListOf<Place>() }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +73,10 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
             requestLocationPermission()
         }
 
+        addNewPlaceButton.setOnClickListener {
+            showDialog()
+        }
+
     }
 
     private fun calculateDistance(location: CurrentLocation) {
@@ -84,7 +88,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
         }
     }
 
-    private fun bindLocation() = GlobalScope.launch(Dispatchers.Main) {
+    private fun bindLocation() {
 
         locationViewModel.locationData.observe(this@PlacesListActivity, Observer {
             calculateDistance(it)
@@ -124,28 +128,30 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
     }
 
-    private fun bindUI() = GlobalScope.launch(Dispatchers.Main) {
+    private fun bindUI() {
+        GlobalScope.launch(Dispatchers.Main) {
+            viewModel.getAllPlaces().observe(this@PlacesListActivity, Observer { location ->
+                if (location == null || location.isEmpty())
+                    return@Observer
+                updatePlacesList(location)
 
-        viewModel.getAllPlaces().observe(this@PlacesListActivity, Observer { location ->
-            if (location == null || location.isEmpty())
-                return@Observer
+            })
 
-            updatePlacesList(location)
+            viewModel.getDownloadingStatus().observe(this@PlacesListActivity, Observer { status ->
+                if (!status)
+                    Toast.makeText(
+                        this@PlacesListActivity,
+                        getString(R.string.no_internet_text),
+                        Toast.LENGTH_LONG
+                    ).show()
+            })
 
-        })
-
-        viewModel.getDownloadingStatus().observe(this@PlacesListActivity, Observer { status ->
-            if (!status)
-                Toast.makeText(
-                    this@PlacesListActivity,
-                    getString(R.string.no_internet_text),
-                    Toast.LENGTH_LONG
-                ).show()
-        })
+        }
 
     }
 
     private fun updatePlacesList(location: List<Place>) {
+        places.addAll(location)
         placesAdapter.setDataSource(location)
         skeleton.showOriginal()
     }
@@ -155,6 +161,17 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
         intent.putExtra("place", place)
         startActivity(intent)
         overridePendingTransition(0, R.anim.fade_out);
+    }
+
+    private fun showDialog() {
+        val currentFragment =
+            NewPlaceFragment()
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(android.R.anim.fade_in, 0, 0, android.R.anim.fade_out)
+            .replace(R.id.fragmentHolder, currentFragment)
+            .addToBackStack("newPlaceFragment")
+            .commit()
     }
 
 }

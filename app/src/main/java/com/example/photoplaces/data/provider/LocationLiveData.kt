@@ -5,7 +5,6 @@ import android.content.Context
 import android.location.Location
 import androidx.lifecycle.LiveData
 import com.example.photoplaces.data.entity.CurrentLocation
-
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -26,7 +25,6 @@ class LocationLiveData(context: Context) : LiveData<CurrentLocation>() {
         super.onInactive()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
-
 
     @SuppressLint("MissingPermission")
     override fun onActive() {

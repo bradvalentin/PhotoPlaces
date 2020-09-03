@@ -2,9 +2,8 @@ package com.example.photoplaces.utils
 
 object Constants {
 
-    const val API_BASE_URL = "http://demo1042273.mockable.io/"
-    const val PERMISSION_RESULT_CODE = 1
-    const val ACTIVITY_REQUEST_CODE = 100
-    const val FADE_ANIMATION_DURATION = 500
+    const val NEW_PLACE_FRAGMENT_TAG = "newPlaceFragment"
+    const val PARCELABLE_PLACE_KEY = "place"
+    const val PARCELABLE_CHANGED_PLACE_KEY = "newPlace"
 
 }

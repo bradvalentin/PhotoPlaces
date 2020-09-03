@@ -13,16 +13,17 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.photoplaces.R
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.databinding.FragmentPlaceDialogBinding
+import com.example.photoplaces.utils.Constants.PARCELABLE_PLACE_KEY
 import com.example.photoplaces.utils.hideKeyboard
 import org.koin.android.ext.android.inject
 
 class NewPlaceFragment : Fragment() {
 
     private val viewModelFactory: NewPlaceFragmentViewModelFactory by inject()
-    private lateinit var viewModel: NewPlaceFragmentViewModel
-    private lateinit var sharedViewModel: SharedViewModel
+    private val newPlaceViewModel: NewPlaceFragmentViewModel by lazy { ViewModelProvider(this, viewModelFactory).get(NewPlaceFragmentViewModel::class.java) }
+    private val sharedViewModel: SharedViewModel by lazy { ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java) }
 
-    lateinit var binding: FragmentPlaceDialogBinding
+    private lateinit var binding: FragmentPlaceDialogBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,65 +34,59 @@ class NewPlaceFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_place_dialog, container, false
         )
+        binding.lifecycleOwner = this
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val place = arguments?.getParcelable<Place>("place")
-
-        sharedViewModel = ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(NewPlaceFragmentViewModel::class.java)
-        binding.viewmodel = viewModel
-        binding.id = place?.id
-        place?.let {
-            bindPlaceData(it)
+        arguments?.getParcelable<Place>(PARCELABLE_PLACE_KEY)?.let {
+            newPlaceViewModel.place = it
         }
+
+        binding.apply {
+            viewmodel = newPlaceViewModel
+        }
+        newPlaceViewModel.bindPlaceData()
 
         bindUIFormVerification()
 
-        viewModel.placeUpdatedOrInsertedLiveData.observe(this, Observer {
+        newPlaceViewModel.placeUpdatedOrInsertedLiveData.observe(this, Observer {
             it?.let {
-                activity?.onBackPressed()
-                activity?.hideKeyboard()
+                activity?.apply {
+                    onBackPressed()
+                    hideKeyboard()
+                }
                 sharedViewModel.setNewPlace(it)
 
             } ?: run {
-                Toast.makeText(activity, getString(R.string.fail_to_save_text), Toast.LENGTH_LONG)
+                Toast.makeText(activity, getString(R.string.failed_to_save_text), Toast.LENGTH_LONG)
                     .show()
             }
         })
     }
 
     private fun bindUIFormVerification() {
-        viewModel.formMediator.observe(this, Observer { validationResult ->
+        newPlaceViewModel.formMediator.observe(this, Observer { validationResult ->
             binding.saveButton.isEnabled = validationResult
         })
 
-        viewModel.latitudeFieldMediator.observe(this, Observer { validationResult ->
-            if (validationResult)
-                binding.textInputLayoutLatitude.error = null
-            else
-                binding.textInputLayoutLatitude.error = getString(R.string.latitude_range_text)
-        })
-
-        viewModel.longitudeFieldMediator.observe(this, Observer { validationResult ->
-            if (validationResult)
-                binding.textInputLayoutLongitude.error = null
-            else
-                binding.textInputLayoutLongitude.error = getString(R.string.longitude_range_text)
-        })
+     //   newPlaceViewModel.latitudeFieldMediator.observe(this, Observer { validationResult ->
+         //   if (validationResult)
+               // binding.textInputLayoutLatitude.error = null
+         //   else
+              //  binding.textInputLayoutLatitude.error = getString(R.string.latitude_range_text)
+    //    })
+//
+//        newPlaceViewModel.longitudeFieldMediator.observe(this, Observer { validationResult ->
+//            if (validationResult)
+//                binding.textInputLayoutLongitude.error = null
+//            else
+//                binding.textInputLayoutLongitude.error = getString(R.string.longitude_range_text)
+//        })
     }
-
-    private fun bindPlaceData(place: Place?) {
-        viewModel.labelLiveData.value = place?.label
-        viewModel.longitudeLiveData.value = (place?.lng ?:0.0).toString()
-        viewModel.latitudeLiveData.value = (place?.lat ?:0.0).toString()
-        viewModel.addressLiveData.value = place?.address
-        viewModel.imageUrlLiveData.value = place?.image
-    }
-
 
 }
 

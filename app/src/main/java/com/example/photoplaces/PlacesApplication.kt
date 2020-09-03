@@ -6,6 +6,8 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.koin.android.ext.android.startKoin
 
+const val DB_NAME = "places"
+
 class PlacesApplication : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -24,11 +26,10 @@ class PlacesApplication : Application() {
             )
         )
     }
-
     private fun initRealm() {
         Realm.init(this)
         val config = RealmConfiguration.Builder()
-            .name("places")
+            .name(DB_NAME)
             .deleteRealmIfMigrationNeeded()
             .build()
         Realm.setDefaultConfiguration(config);

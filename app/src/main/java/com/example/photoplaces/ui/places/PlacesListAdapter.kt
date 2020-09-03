@@ -34,14 +34,14 @@ class PlacesListAdapter(private val placeItemClickListener: PlaceItemClickListen
     }
 
     override fun onBindViewHolder(holder: PlacesViewHolder, position: Int) {
-        holder.view.place = places[position]
-        holder.view.listener = placeItemClickListener
-        holder.view.position = position
+        holder.view.apply {
+            place = places[position]
+            listener = placeItemClickListener
+            pos = position
+        }
     }
 
-    override fun getItemId(index: Int): Long {
-        return getItemId(index)
-    }
+    override fun getItemId(index: Int): Long = getItemId(index)
 
     override fun getItemCount(): Int = places.size
 

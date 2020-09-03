@@ -15,7 +15,7 @@ class PlaceDiffCallback(private val oldList: List<Place>, private val newList: L
     }
 
     override fun areContentsTheSame(oldPosition: Int, newPosition: Int): Boolean {
-        return oldList[oldPosition].equals(newList[newPosition])
+        return oldList[oldPosition] == newList[newPosition]
     }
 
     @Nullable

@@ -7,12 +7,10 @@ import com.example.photoplaces.data.entity.Place
 
 class SharedViewModel: ViewModel() {
 
-    private val _newPlaceMutableLiveData = MutableLiveData<Place>()
-    val newPlaceMutableLiveData: LiveData<Place>
-        get() = _newPlaceMutableLiveData
+    val newPlaceMutableLiveData: LiveData<Place> = MutableLiveData<Place>()
 
     fun setNewPlace(place: Place) {
-        _newPlaceMutableLiveData.value = place
+        (newPlaceMutableLiveData as MutableLiveData).value = place
     }
 
 }

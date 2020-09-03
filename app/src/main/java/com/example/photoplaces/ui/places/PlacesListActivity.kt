@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.coroutineScope
 import com.example.photoplaces.R
 import com.example.photoplaces.data.entity.CurrentLocation
 import com.example.photoplaces.data.entity.Place
@@ -20,9 +21,11 @@ import com.example.photoplaces.data.provider.LocationViewModel
 import com.example.photoplaces.ui.newPlace.NewPlaceFragment
 import com.example.photoplaces.ui.placeDetails.PlaceDetailsActivity
 import com.example.photoplaces.utils.CarouselSnapHelper
-import com.example.photoplaces.utils.Constants.ACTIVITY_REQUEST_CODE
-import com.example.photoplaces.utils.Constants.PERMISSION_RESULT_CODE
+import com.example.photoplaces.utils.Constants.NEW_PLACE_FRAGMENT_TAG
+import com.example.photoplaces.utils.Constants.PARCELABLE_CHANGED_PLACE_KEY
+import com.example.photoplaces.utils.Constants.PARCELABLE_PLACE_KEY
 import com.example.photoplaces.utils.formatToKm
+import com.example.photoplaces.utils.setOnSingleClickListener
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import kotlinx.android.synthetic.main.activity_places_list.*
@@ -31,13 +34,24 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
+const val ACTIVITY_REQUEST_CODE = 100
+const val PERMISSION_RESULT_CODE = 1
+const val FLOAT_DECIMALS = 2
+const val SKELETON_VIEWS_COUNT = 10
+const val INITIAL_POSITION = -1
 
 class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
+    private var position: Int = INITIAL_POSITION
+
     private val viewModelFactory: PlacesViewModelFactory by inject()
 
-    private lateinit var viewModel: PlacesViewModel
-    private lateinit var locationViewModel: LocationViewModel
+    private val viewModel: PlacesViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(PlacesViewModel::class.java)
+    }
+    private val locationViewModel: LocationViewModel by lazy {
+        ViewModelProviders.of(this).get(LocationViewModel::class.java)
+    }
 
     private val distanceProvider: DistanceProvider by inject()
 
@@ -48,19 +62,14 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     private val skeleton: Skeleton by lazy {
         placesRecyclerView.applySkeleton(
             R.layout.place_list_item,
-            10
+            SKELETON_VIEWS_COUNT
         )
     }
-
-    private var position: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_places_list)
         setSupportActionBar(toolbar)
-
-        viewModel = ViewModelProvider(this, viewModelFactory).get(PlacesViewModel::class.java)
-        locationViewModel = ViewModelProviders.of(this).get(LocationViewModel::class.java)
 
         placesRecyclerView.adapter = placesAdapter
 
@@ -75,7 +84,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
             requestLocationPermission()
         }
 
-        addNewPlaceButton.setOnClickListener {
+        addNewPlaceButton.setOnSingleClickListener {
             showDialog()
         }
 
@@ -85,7 +94,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
         placesAdapter.places.forEachIndexed { index, place ->
             val distance = distanceProvider.distanceBetweenTwoLocations(place, location)
-            place.distance = distance.formatToKm(2)
+            place.distance = distance.formatToKm(FLOAT_DECIMALS)
             placesAdapter.notifyItemChanged(index, Unit)
         }
     }
@@ -131,12 +140,12 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     }
 
     private fun bindUI() {
-        GlobalScope.launch(Dispatchers.Main) {
+        lifecycle.coroutineScope.launch {
+
             viewModel.getAllPlaces().observe(this@PlacesListActivity, Observer { location ->
                 if (location == null || location.isEmpty())
                     return@Observer
                 updatePlacesList(location)
-
             })
 
             viewModel.getDownloadingStatus().observe(this@PlacesListActivity, Observer { status ->
@@ -147,9 +156,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
                         Toast.LENGTH_LONG
                     ).show()
             })
-
         }
-
     }
 
     private fun updatePlacesList(location: List<Place>) {
@@ -158,8 +165,9 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     }
 
     override fun placeItemPressed(place: Place, position: Int) {
-        val intent = Intent(this, PlaceDetailsActivity::class.java)
-        intent.putExtra("place", place)
+        val intent = Intent(this, PlaceDetailsActivity::class.java).apply {
+            putExtra(PARCELABLE_PLACE_KEY, place)
+        }
         startActivityForResult(intent, ACTIVITY_REQUEST_CODE)
         overridePendingTransition(0, R.anim.fade_out)
         this.position = position
@@ -168,10 +176,11 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                val place = data?.getParcelableExtra<Place>("newPlace")
-                place?.let {
-                    placesAdapter.places[position] = place
-                    placesAdapter.notifyItemChanged(position)
+                data?.getParcelableExtra<Place>(PARCELABLE_CHANGED_PLACE_KEY)?.let {
+                    placesAdapter.apply {
+                        places[position] = it
+                        notifyItemChanged(position)
+                    }
                 }
             }
         }
@@ -180,13 +189,11 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
     }
 
     private fun showDialog() {
-        val currentFragment =
-            NewPlaceFragment()
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(android.R.anim.fade_in, 0, 0, android.R.anim.fade_out)
-            .replace(R.id.fragmentHolder, currentFragment)
-            .addToBackStack("newPlaceFragment")
+            .replace(R.id.fragmentHolder, NewPlaceFragment())
+            .addToBackStack(NEW_PLACE_FRAGMENT_TAG)
             .commit()
     }
 

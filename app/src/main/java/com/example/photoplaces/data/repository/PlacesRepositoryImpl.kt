@@ -1,20 +1,22 @@
 package com.example.photoplaces.data.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.photoplaces.data.db.PlacesDao
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.data.network.RemoteDataSourceInterface
 import com.example.photoplaces.data.network.response.PlacesApiResponse
-import io.realm.RealmResults
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
+
+const val STATUS_OK = "ok"
 
 class PlacesRepositoryImpl(
     private val remoteDataSourceInterface: RemoteDataSourceInterface,
-    private val placesDao: PlacesDao) : PlacesRepository {
+    private val placesDao: PlacesDao) : PlacesRepository, CoroutineScope  {
+
+    private val job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
     init {
         remoteDataSourceInterface.downloadedPlaces.observeForever { placesResponse ->
@@ -23,8 +25,9 @@ class PlacesRepositoryImpl(
     }
 
     private fun persistFetchedPlaces(placesResponse: PlacesApiResponse) {
-        GlobalScope.launch(Dispatchers.IO) {
-            if (placesResponse.status == "ok" && placesResponse.locations.isNotEmpty()) {
+
+        launch {
+            if (placesResponse.status == STATUS_OK && placesResponse.locations.isNotEmpty()) {
                 placesDao.addAllPlaces(placesResponse.locations)
             }
         }
@@ -51,6 +54,10 @@ class PlacesRepositoryImpl(
         if (placesDao.isDatabaseEmpty()) {
             remoteDataSourceInterface.fetchAllPlaces()
         }
+    }
+
+    override fun cancel() {
+        job.cancel()
     }
 
 }

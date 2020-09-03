@@ -6,7 +6,5 @@ import androidx.lifecycle.LiveData
 import com.example.photoplaces.data.entity.CurrentLocation
 
 class LocationViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val _locationData = LocationLiveData(application)
-    val locationData: LiveData<CurrentLocation> = _locationData
+    val locationData: LiveData<CurrentLocation> = LocationLiveData(application)
 }

@@ -10,14 +10,16 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 
+const val INTERVAL = 10000L
+const val FASTEST_INTERVAL = 5000L
 class LocationLiveData(context: Context) : LiveData<CurrentLocation>() {
 
     private var fusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
     private val locationRequest: LocationRequest = LocationRequest.create().apply {
-        interval = 10000
-        fastestInterval = 5000
+        interval = INTERVAL
+        fastestInterval = FASTEST_INTERVAL
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 

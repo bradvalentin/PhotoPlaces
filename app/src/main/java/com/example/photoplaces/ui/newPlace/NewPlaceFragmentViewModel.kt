@@ -1,45 +1,58 @@
 package com.example.photoplaces.ui.newPlace
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.data.repository.PlacesRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import com.example.photoplaces.utils.safeLet
 import kotlinx.coroutines.launch
+
+const val DOT_TEXT = "."
+const val MINUS_TEXT = "-"
+const val MIN_VALUE_LATITUDE = -90.0
+const val MAX_VALUE_LATITUDE = 90.0
+const val MIN_VALUE_LONGITUDE = -180.0
+const val MAX_VALUE_LONGITUDE = 80.0
 
 class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) : ViewModel() {
 
-    private val _placeUpdatedOrInsertedLiveData = MutableLiveData<Place?>()
-    val placeUpdatedOrInsertedLiveData: LiveData<Place?>
-        get() = _placeUpdatedOrInsertedLiveData
+    var place: Place? = null
 
+    val placeUpdatedOrInsertedLiveData: LiveData<Place?> = MutableLiveData<Place?>()
+    private fun setPlaceUpdatedOrInsertedLiveData(place: Place?) {
+        (placeUpdatedOrInsertedLiveData as MutableLiveData).value = place
+    }
     val labelLiveData = MutableLiveData<String>()
     val addressLiveData = MutableLiveData<String>()
     val imageUrlLiveData = MutableLiveData<String>()
     val latitudeLiveData = MutableLiveData<String>()
     val longitudeLiveData = MutableLiveData<String>()
 
+    val formMediator = MediatorLiveData<Boolean>().apply {
+        addSource(labelLiveData) { validateForm() }
+        addSource(addressLiveData) { validateForm() }
+        addSource(latitudeLiveData) { validateForm() }
+        addSource(longitudeLiveData) { validateForm() }
+    }
 
-    val formMediator = MediatorLiveData<Boolean>()
-    val latitudeFieldMediator = MediatorLiveData<Boolean>()
-    val longitudeFieldMediator = MediatorLiveData<Boolean>()
+    val latitudeFieldMediator = MediatorLiveData<Boolean>().apply {
+        addSource(latitudeLiveData) { validateLatitudeField() }
+    }
 
-    init {
-        formMediator.addSource(labelLiveData) { validateForm() }
-        formMediator.addSource(addressLiveData) { validateForm() }
-        formMediator.addSource(latitudeLiveData) { validateForm() }
-        formMediator.addSource(longitudeLiveData) { validateForm() }
+    val longitudeFieldMediator = MediatorLiveData<Boolean>().apply {
+        addSource(longitudeLiveData) { validateLongitudeField() }
+    }
 
-        latitudeFieldMediator.addSource(latitudeLiveData) { validateLatitudeField() }
-        longitudeFieldMediator.addSource(longitudeLiveData) { validateLongitudeField() }
+    fun bindPlaceData() {
+        labelLiveData.value = place?.label
+        longitudeLiveData.value = (place?.lng ?: 0.0).toString()
+        latitudeLiveData.value = (place?.lat ?: 0.0).toString()
+        addressLiveData.value = place?.address
+        imageUrlLiveData.value = place?.image
     }
 
     private fun validateLongitudeField() {
         longitudeLiveData.value?.let { longitude ->
-            longitudeFieldMediator.value = checkLongitudeFormat(longitude)
+            longitudeFieldMediator.value = checkCoordinateFormat(longitude, MIN_VALUE_LONGITUDE, MAX_VALUE_LONGITUDE)
 
 
         } ?: run {
@@ -47,91 +60,78 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
         }
     }
 
-    private fun checkLongitudeFormat(longitude: String): Boolean {
-        return !longitude.startsWith(".") &&
-                longitude != "-" &&
-                longitude.isNotEmpty() &&
-                (longitude.toDouble() >= -180.0 && longitude.toDouble() <= 80.0)
+    private fun checkCoordinateFormat(coordinate: String, minValue: Double, maxValue: Double): Boolean {
+        return !coordinate.startsWith(DOT_TEXT) &&
+                coordinate != MINUS_TEXT &&
+                coordinate.isNotEmpty() &&
+                (coordinate.toDouble() in minValue..maxValue)
     }
 
     private fun validateLatitudeField() {
         latitudeLiveData.value?.let { latitude ->
-            latitudeFieldMediator.value = checkLatitudeFormat(latitude)
-
+            latitudeFieldMediator.value = checkCoordinateFormat(latitude, MIN_VALUE_LATITUDE, MAX_VALUE_LATITUDE)
 
         } ?: run {
             latitudeFieldMediator.value = false
         }
     }
 
-    private fun checkLatitudeFormat(latitude: String): Boolean {
-        return latitude.isNotEmpty() &&
-                !latitude.startsWith(".") &&
-                latitude != "-" &&
-                (latitude.toDouble() >= -90.0 && latitude.toDouble() <= 90.0)
-    }
-
     private fun validateForm() {
 
-        labelLiveData.value?.let { label ->
-            addressLiveData.value?.let { address ->
-                latitudeLiveData.value?.let { latitude ->
-                    longitudeLiveData.value?.let { longitude ->
-                        formMediator.value =
-                            label.isNotEmpty() &&
-                                    address.isNotEmpty() &&
-                                    checkLongitudeFormat(longitude) &&
-                                    checkLatitudeFormat(latitude)
-                    }
-                }
-            }
-        } ?: run {
+        safeLet(
+            addressLiveData.value,
+            labelLiveData.value,
+            latitudeLiveData.value,
+            longitudeLiveData.value
+        ) { adr, lbl, latitude, longitude ->
+            formMediator.value =
+                lbl.isNotEmpty() &&
+                        adr.isNotEmpty() &&
+                        checkCoordinateFormat(longitude, MIN_VALUE_LONGITUDE, MAX_VALUE_LONGITUDE) &&
+                        checkCoordinateFormat(latitude, MIN_VALUE_LATITUDE, MAX_VALUE_LATITUDE)
+
+        }?: run {
             formMediator.value = false
         }
+
     }
 
-    fun insertOrUpdate(placeId: String?) {
+    fun insertOrUpdate() {
 
-        addressLiveData.value?.let { address ->
-            labelLiveData.value?.let { label ->
-                latitudeLiveData.value?.let { latitude ->
-                    longitudeLiveData.value?.let { longitude ->
-                        val place = Place()
-                        place.apply {
-                            placeId?.let {
-                                id = it
-                            }
-                            this.address = address
-                            image = imageUrlLiveData.value
-                            this.label = label
-                            lat = latitude.toDouble()
-                            lng = longitude.toDouble()
-                            GlobalScope.launch(Dispatchers.Main) {
-                                _placeUpdatedOrInsertedLiveData.value =
-                                    placesRepository.insertOrUpdatePlace(place)
-                            }
-                        }
-                    } ?: run {
-                        _placeUpdatedOrInsertedLiveData.value = null
-                    }
-                } ?: run {
-                    _placeUpdatedOrInsertedLiveData.value = null
+        safeLet(
+            addressLiveData.value,
+            labelLiveData.value,
+            latitudeLiveData.value,
+            longitudeLiveData.value
+        ) { adr, lbl, latitude, longitude ->
+            val newPlace = Place()
+            newPlace.apply {
+                place?.id?.let {
+                    id = it
                 }
-            } ?: run {
-                _placeUpdatedOrInsertedLiveData.value = null
+                address = adr
+                image = imageUrlLiveData.value
+                label = lbl
+                lat = latitude.toDouble()
+                lng = longitude.toDouble()
+
+                viewModelScope.launch {
+                    setPlaceUpdatedOrInsertedLiveData(placesRepository.insertOrUpdatePlace(newPlace))
+                }
             }
         } ?: run {
-            _placeUpdatedOrInsertedLiveData.value = null
+            setPlaceUpdatedOrInsertedLiveData(null)
         }
 
     }
 
     override fun onCleared() {
-        formMediator.removeSource(labelLiveData)
-        formMediator.removeSource(addressLiveData)
-        formMediator.removeSource(latitudeLiveData)
-        formMediator.removeSource(longitudeLiveData)
-
+        formMediator.apply {
+            removeSource(labelLiveData)
+            removeSource(addressLiveData)
+            removeSource(latitudeLiveData)
+            removeSource(longitudeLiveData)
+        }
         latitudeFieldMediator.removeSource(latitudeLiveData)
         longitudeFieldMediator.removeSource(longitudeLiveData)
     }

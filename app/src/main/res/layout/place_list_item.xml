@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="position"
+            name="pos"
             type="int"/>
 
         <variable
@@ -30,7 +30,7 @@
         android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
-        android:onClick='@{() -> listener.placeItemPressed(place, position)}'
+        android:onSingleClick='@{() -> listener.placeItemPressed(place, pos)}'
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout

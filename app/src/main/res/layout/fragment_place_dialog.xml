@@ -6,9 +6,6 @@
         <import type="android.view.View" />
 
         <variable
-            name="id"
-            type="String"/>
-        <variable
             name="viewmodel"
             type="com.example.photoplaces.ui.newPlace.NewPlaceFragmentViewModel" />
     </data>
@@ -107,6 +104,8 @@
                 app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="0dp"
                 app:errorEnabled="true"
+                app:errorText="@{@string/latitude_range_text}"
+                app:isValid="@{viewmodel.latitudeFieldMediator}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayoutImageUrl">
@@ -132,6 +131,8 @@
                 app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="0dp"
                 app:errorEnabled="true"
+                app:errorText="@{@string/longitude_range_text}"
+                app:isValid="@{viewmodel.longitudeFieldMediator}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayoutLatitude">
@@ -159,7 +160,7 @@
                 android:layout_marginEnd="36dp"
                 android:layout_marginBottom="20dp"
                 android:enabled="false"
-                android:onClick="@{() -> viewmodel.insertOrUpdate(id)}"
+                android:onSingleClick="@{() -> viewmodel.insertOrUpdate()}"
                 android:text="@string/save_button_text"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

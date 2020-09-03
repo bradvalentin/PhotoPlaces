@@ -1,7 +1,5 @@
 package com.example.photoplaces.data.db
-
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.utils.asLiveData
@@ -10,7 +8,6 @@ import io.realm.Realm
 class PlacesDaoImpl : PlacesDao {
 
     override fun addAllPlaces(places: List<Place>): Boolean {
-
         val realm = Realm.getDefaultInstance()
 
         return try {
@@ -36,6 +33,7 @@ class PlacesDaoImpl : PlacesDao {
     }
 
     override fun isDatabaseEmpty(): Boolean {
+
         val realm = Realm.getDefaultInstance()
         val isEmpty = realm.isEmpty
         realm.close()

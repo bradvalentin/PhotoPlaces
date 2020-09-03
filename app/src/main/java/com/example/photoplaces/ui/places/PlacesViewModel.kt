@@ -22,4 +22,9 @@ class PlacesViewModel(
     suspend fun getDownloadingStatus(): LiveData<Boolean> {
         return placesRepository.downloadingStatus()
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        placesRepository.cancel()
+    }
 }

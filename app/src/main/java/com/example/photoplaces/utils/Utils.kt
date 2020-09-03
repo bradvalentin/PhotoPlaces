@@ -6,14 +6,15 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.example.photoplaces.R
-import com.example.photoplaces.utils.Constants.FADE_ANIMATION_DURATION
+import com.google.android.material.textfield.TextInputLayout
 import java.text.DecimalFormat
+
+const val FADE_ANIMATION_DURATION = 500
 
 fun ImageView.loadImageFromUrl(url: String?) {
     val options = RequestOptions()
@@ -33,14 +34,28 @@ fun loadImage(view: ImageView, url: String?) {
     view.loadImageFromUrl(url)
 }
 
+@BindingAdapter("android:onSingleClick")
+fun View.setOnSingleClickListener(onSafeClick: () -> Unit) {
+    val singleClickListener = SingleClickListener {
+        onSafeClick()
+    }
+    setOnClickListener(singleClickListener)
+}
+
+@BindingAdapter("isValid", "errorText")
+fun setErrorMessage(target: TextInputLayout, isValid: Boolean, errorText: String) {
+    if (isValid) target.error = null
+    else target.error = errorText
+}
+
+inline fun <T1: Any, T2: Any, T3: Any, T4: Any, R: Any> safeLet(p1: T1?, p2: T2?, p3: T3?, p4: T4?, block: (T1, T2, T3, T4)->R?): R? {
+    return if (p1 != null && p2 != null && p3 != null && p4 != null) block(p1, p2, p3, p4) else null
+}
+
 fun Float.formatToKm(fracDigits: Int): String {
     val df = DecimalFormat()
     df.maximumFractionDigits = fracDigits
     return df.format(this / 1000.0).plus(" km")
-}
-
-fun Fragment.hideKeyboard() {
-    view?.let { activity?.hideKeyboard(it) }
 }
 
 fun Activity.hideKeyboard() {

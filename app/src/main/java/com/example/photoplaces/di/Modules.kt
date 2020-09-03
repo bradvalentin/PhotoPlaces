@@ -26,6 +26,8 @@ import org.koin.dsl.module.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+const val API_BASE_URL = "http://demo1042273.mockable.io/"
+
 val connInterceptorModule = module {
 
     fun provideConnectivityInterceptor(application: Application): ConnectivityInterceptor {
@@ -75,9 +77,7 @@ val netModule = module {
 
     fun provideRetrofit(factory: Gson, client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(
-                Constants.API_BASE_URL
-            )
+            .baseUrl(API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(factory))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(client)
@@ -104,9 +104,7 @@ val factoryModule = module {
     }
 
     fun provideNewPlaceFragmentViewModelFactory(placesRepository: PlacesRepository): NewPlaceFragmentViewModelFactory {
-        return NewPlaceFragmentViewModelFactory(
-            placesRepository
-        )
+        return NewPlaceFragmentViewModelFactory(placesRepository)
     }
     factory { providePlacesViewModelFactory(get()) }
 
@@ -131,6 +129,7 @@ val databaseModule = module {
     }
 
     factory { providePlacesDao() }
+
 }
 
 val distanceProviderModule = module {

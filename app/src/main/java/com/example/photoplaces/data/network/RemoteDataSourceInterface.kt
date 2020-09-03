@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import com.example.photoplaces.data.network.response.PlacesApiResponse
 
 interface RemoteDataSourceInterface {
-    val downloadedPlaces: LiveData<PlacesApiResponse>
-    val downloading: LiveData<Boolean>
+    var downloadedPlaces: LiveData<PlacesApiResponse>
+    var downloading: LiveData<Boolean>
     suspend fun fetchAllPlaces()
 }

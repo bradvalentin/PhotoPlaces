@@ -1,6 +1,5 @@
 package com.example.photoplaces.data.network
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.photoplaces.data.network.api.PlacesApiService
@@ -11,25 +10,24 @@ class RemoteDataSourceInterfaceImpl(
     private val placesApiService: PlacesApiService
 ) : RemoteDataSourceInterface {
 
-    private val _downloadedPlaces = MutableLiveData<PlacesApiResponse>()
-    override val downloadedPlaces: LiveData<PlacesApiResponse>
-        get() = _downloadedPlaces
+    override var downloadedPlaces: LiveData<PlacesApiResponse> = MutableLiveData<PlacesApiResponse>()
+    private fun setDownloadedPlaces(placesApiResponse: PlacesApiResponse?) {
+        (downloadedPlaces as MutableLiveData).value = placesApiResponse
+    }
 
-    private val _downloading = MutableLiveData<Boolean>()
-    override val downloading: LiveData<Boolean>
-        get() = _downloading
-
+    override var downloading: LiveData<Boolean> = MutableLiveData<Boolean>()
+    private fun setDownloading(isDownloading: Boolean) {
+        (downloading as MutableLiveData).value = isDownloading
+    }
     override suspend fun fetchAllPlaces() {
         try {
             val fetchedPlaces = placesApiService.fetchAllPlaces()
 
-            _downloadedPlaces.postValue(fetchedPlaces.body())
-            _downloading.postValue(true)
+            setDownloadedPlaces(fetchedPlaces.body())
+            setDownloading(true)
 
         } catch (e: NoConnectivityException) {
-            Log.e("Connection", "No internet", e)
-            _downloading.postValue(false)
-
+            setDownloading(false)
         }
     }
 

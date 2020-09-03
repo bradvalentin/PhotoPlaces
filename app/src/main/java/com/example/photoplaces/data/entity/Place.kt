@@ -18,28 +18,4 @@ open class Place(
     var lng: Double = 0.0,
     @Ignore
     var distance: String? = null
-): Parcelable, RealmObject() {
-
-    override fun equals(other: Any?): Boolean {
-
-        if(javaClass != other?.javaClass)
-            false
-
-        other as Place
-
-        if(id != other.id)
-            false
-        if(address != other.address)
-            false
-        if(image != other.image)
-            false
-        if(label != other.label)
-            false
-        if(lat != other.lat)
-            false
-        if(lng != other.lng)
-            false
-
-        return true
-    }
-}
+): Parcelable, RealmObject()

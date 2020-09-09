@@ -15,12 +15,11 @@ import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.databinding.FragmentPlaceDialogBinding
 import com.example.photoplaces.utils.Constants.PARCELABLE_PLACE_KEY
 import com.example.photoplaces.utils.hideKeyboard
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class NewPlaceFragment : Fragment() {
 
-    private val viewModelFactory: NewPlaceFragmentViewModelFactory by inject()
-    private val newPlaceViewModel: NewPlaceFragmentViewModel by lazy { ViewModelProvider(this, viewModelFactory).get(NewPlaceFragmentViewModel::class.java) }
+    private val newPlaceViewModel: NewPlaceFragmentViewModel by viewModel()
     private val sharedViewModel: SharedViewModel by lazy { ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java) }
 
     private lateinit var binding: FragmentPlaceDialogBinding
@@ -51,8 +50,6 @@ class NewPlaceFragment : Fragment() {
         }
         newPlaceViewModel.bindPlaceData()
 
-        bindUIFormVerification()
-
         newPlaceViewModel.placeUpdatedOrInsertedLiveData.observe(this, Observer {
             it?.let {
                 activity?.apply {
@@ -66,26 +63,6 @@ class NewPlaceFragment : Fragment() {
                     .show()
             }
         })
-    }
-
-    private fun bindUIFormVerification() {
-        newPlaceViewModel.formMediator.observe(this, Observer { validationResult ->
-            binding.saveButton.isEnabled = validationResult
-        })
-
-     //   newPlaceViewModel.latitudeFieldMediator.observe(this, Observer { validationResult ->
-         //   if (validationResult)
-               // binding.textInputLayoutLatitude.error = null
-         //   else
-              //  binding.textInputLayoutLatitude.error = getString(R.string.latitude_range_text)
-    //    })
-//
-//        newPlaceViewModel.longitudeFieldMediator.observe(this, Observer { validationResult ->
-//            if (validationResult)
-//                binding.textInputLayoutLongitude.error = null
-//            else
-//                binding.textInputLayoutLongitude.error = getString(R.string.longitude_range_text)
-//        })
     }
 
 }

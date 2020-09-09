@@ -29,10 +29,9 @@ import com.example.photoplaces.utils.setOnSingleClickListener
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import kotlinx.android.synthetic.main.activity_places_list.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val ACTIVITY_REQUEST_CODE = 100
 const val PERMISSION_RESULT_CODE = 1
@@ -44,11 +43,8 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
     private var position: Int = INITIAL_POSITION
 
-    private val viewModelFactory: PlacesViewModelFactory by inject()
 
-    private val viewModel: PlacesViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(PlacesViewModel::class.java)
-    }
+    private val viewModel: PlacesViewModel by viewModel()
     private val locationViewModel: LocationViewModel by lazy {
         ViewModelProviders.of(this).get(LocationViewModel::class.java)
     }

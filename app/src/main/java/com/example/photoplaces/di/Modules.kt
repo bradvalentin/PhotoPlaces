@@ -1,8 +1,9 @@
 package com.example.photoplaces.di
 
 import android.app.Application
+import androidx.room.Room
 import com.example.photoplaces.data.db.PlacesDao
-import com.example.photoplaces.data.db.PlacesDaoImpl
+import com.example.photoplaces.data.db.PlacesDatabase
 import com.example.photoplaces.data.network.ConnectivityInterceptor
 import com.example.photoplaces.data.network.ConnectivityInterceptorImpl
 import com.example.photoplaces.data.network.RemoteDataSourceInterface
@@ -12,9 +13,8 @@ import com.example.photoplaces.data.provider.DistanceProvider
 import com.example.photoplaces.data.provider.DistanceProviderImpl
 import com.example.photoplaces.data.repository.PlacesRepository
 import com.example.photoplaces.data.repository.PlacesRepositoryImpl
-import com.example.photoplaces.ui.newPlace.NewPlaceFragmentViewModelFactory
-import com.example.photoplaces.ui.places.PlacesViewModelFactory
-import com.example.photoplaces.utils.Constants
+import com.example.photoplaces.ui.newPlace.NewPlaceFragmentViewModel
+import com.example.photoplaces.ui.places.PlacesViewModel
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -22,11 +22,29 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
+import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 const val API_BASE_URL = "http://demo1042273.mockable.io/"
+const val DB_NAME = "places"
+
+val databaseModule = module {
+
+    fun provideDatabase(application: Application): PlacesDatabase {
+        return Room.databaseBuilder(application, PlacesDatabase::class.java, DB_NAME)
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    fun providePlacesDao(database: PlacesDatabase): PlacesDao {
+        return  database.placesDao()
+    }
+
+    single { provideDatabase(androidApplication()) }
+    single { providePlacesDao(get()) }
+}
 
 val connInterceptorModule = module {
 
@@ -98,17 +116,15 @@ val networkDataSource = module {
     single { provideNetworkDataSource(get()) }
 }
 
-val factoryModule = module {
-    fun providePlacesViewModelFactory(placesRepository: PlacesRepository): PlacesViewModelFactory {
-        return PlacesViewModelFactory(placesRepository)
+val viewModelModule = module {
+
+    viewModel {
+        PlacesViewModel(get())
     }
 
-    fun provideNewPlaceFragmentViewModelFactory(placesRepository: PlacesRepository): NewPlaceFragmentViewModelFactory {
-        return NewPlaceFragmentViewModelFactory(placesRepository)
+    viewModel {
+        NewPlaceFragmentViewModel(get())
     }
-    factory { providePlacesViewModelFactory(get()) }
-
-    factory { provideNewPlaceFragmentViewModelFactory(get()) }
 }
 
 val repositoryModule = module {
@@ -120,16 +136,6 @@ val repositoryModule = module {
     }
 
     single { providePlacesRepository(get(), get()) }
-}
-
-val databaseModule = module {
-
-    fun providePlacesDao(): PlacesDao {
-        return PlacesDaoImpl()
-    }
-
-    factory { providePlacesDao() }
-
 }
 
 val distanceProviderModule = module {

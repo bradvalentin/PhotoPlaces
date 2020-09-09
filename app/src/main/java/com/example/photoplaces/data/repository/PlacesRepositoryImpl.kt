@@ -34,7 +34,7 @@ class PlacesRepositoryImpl(
     }
 
     override suspend fun fetchAllPlaces(): LiveData<List<Place>> {
-        return withContext(Dispatchers.Main) {
+        return withContext(Dispatchers.IO) {
             initPlacesData()
             placesDao.fetchAllPlaces()
         }
@@ -45,14 +45,17 @@ class PlacesRepositoryImpl(
     }
 
     override suspend fun insertOrUpdatePlace(place: Place): Place? {
-        return withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             placesDao.insertOrUpdatePlace(place)
         }
+        return place
     }
 
     private suspend fun initPlacesData() {
-        if (placesDao.isDatabaseEmpty()) {
-            remoteDataSourceInterface.fetchAllPlaces()
+        if (placesDao.isDatabaseEmpty() == 0) {
+            withContext(Dispatchers.Main) {
+                remoteDataSourceInterface.fetchAllPlaces()
+            }
         }
     }
 

@@ -159,7 +159,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="36dp"
                 android:layout_marginBottom="20dp"
-                android:enabled="false"
+                android:enabled="@{viewmodel.formMediator}"
                 android:onSingleClick="@{() -> viewmodel.insertOrUpdate()}"
                 android:text="@string/save_button_text"
                 app:layout_constraintBottom_toBottomOf="parent"

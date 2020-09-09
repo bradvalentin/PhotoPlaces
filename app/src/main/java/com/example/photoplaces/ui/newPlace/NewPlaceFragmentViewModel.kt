@@ -17,7 +17,7 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
 
     var place: Place? = null
 
-    val placeUpdatedOrInsertedLiveData: LiveData<Place?> = MutableLiveData<Place?>()
+    val placeUpdatedOrInsertedLiveData: LiveData<Place?> = MutableLiveData()
     private fun setPlaceUpdatedOrInsertedLiveData(place: Place?) {
         (placeUpdatedOrInsertedLiveData as MutableLiveData).value = place
     }

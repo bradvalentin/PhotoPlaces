@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <variable
+            name="listener"
+            type="com.example.photoplaces.ui.placeDetails.DetailsActivityButtonsActions" />
 
         <variable
             name="place"
             type="com.example.photoplaces.data.entity.Place" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
@@ -53,12 +57,15 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fillViewport="true"
             android:overScrollMode="never"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
             <LinearLayout
+                android:id="@+id/layoutDetails"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -111,14 +118,33 @@
                     android:textSize="16sp" />
 
             </LinearLayout>
+
         </androidx.core.widget.NestedScrollView>
 
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp"
+            app:layout_anchor="@id/layoutDetails"
+            app:layout_anchorGravity="bottom|center_horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/directionButton"
+                style="@style/MtButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onSingleClick="@{() -> listener.onDirectionsButtonPressed()}"
+                android:text="@string/directions_text" />
+
+        </FrameLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/editButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="25dp"
+            android:onSingleClick="@{() -> listener.onEditButtonPressed()}"
             android:src="@drawable/ic_edit"
             app:backgroundTint="@color/colorAccent"
             app:layout_anchor="@id/appBarLayout"
@@ -128,8 +154,7 @@
         <FrameLayout
             android:id="@+id/fragmentHolder"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-             />
+            android:layout_height="match_parent" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

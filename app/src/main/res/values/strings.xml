@@ -16,6 +16,7 @@
     <string name="failed_to_save_text">Failed to save</string>
     <string name="latitude_range_text">Latitudes range from -90 to 90</string>
     <string name="longitude_range_text">Longitudes range from -180 to 80</string>
+    <string name="directions_text">Directions</string>
 
 
 </resources>

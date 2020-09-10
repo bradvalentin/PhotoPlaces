@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -18,6 +19,8 @@ import com.example.photoplaces.data.entity.CurrentLocation
 import com.example.photoplaces.data.entity.Place
 import com.example.photoplaces.data.provider.DistanceProvider
 import com.example.photoplaces.data.provider.LocationViewModel
+import com.example.photoplaces.databinding.ActivityPlaceDetailsBinding
+import com.example.photoplaces.databinding.ActivityPlacesListBinding
 import com.example.photoplaces.ui.newPlace.NewPlaceFragment
 import com.example.photoplaces.ui.placeDetails.PlaceDetailsActivity
 import com.example.photoplaces.utils.CarouselSnapHelper
@@ -25,7 +28,7 @@ import com.example.photoplaces.utils.Constants.NEW_PLACE_FRAGMENT_TAG
 import com.example.photoplaces.utils.Constants.PARCELABLE_CHANGED_PLACE_KEY
 import com.example.photoplaces.utils.Constants.PARCELABLE_PLACE_KEY
 import com.example.photoplaces.utils.formatToKm
-import com.example.photoplaces.utils.setOnSingleClickListener
+import com.example.photoplaces.utils.safeClick
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import kotlinx.android.synthetic.main.activity_places_list.*
@@ -39,7 +42,7 @@ const val FLOAT_DECIMALS = 2
 const val SKELETON_VIEWS_COUNT = 10
 const val INITIAL_POSITION = -1
 
-class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
+class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener, PlacesActivityButtonsActions{
 
     private var position: Int = INITIAL_POSITION
 
@@ -61,11 +64,15 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
             SKELETON_VIEWS_COUNT
         )
     }
+    private lateinit var binding: ActivityPlacesListBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_places_list)
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_places_list)
+
         setSupportActionBar(toolbar)
+        binding.listener = this
 
         placesRecyclerView.adapter = placesAdapter
 
@@ -78,10 +85,6 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
             bindLocation()
         } else {
             requestLocationPermission()
-        }
-
-        addNewPlaceButton.setOnSingleClickListener {
-            showDialog()
         }
 
     }
@@ -184,7 +187,7 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
 
     }
 
-    private fun showDialog() {
+    override fun onAddNewPlaceButtonPressed() {
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(android.R.anim.fade_in, 0, 0, android.R.anim.fade_out)
@@ -193,4 +196,9 @@ class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener {
             .commit()
     }
 
+}
+
+
+interface PlacesActivityButtonsActions {
+    fun onAddNewPlaceButtonPressed()
 }

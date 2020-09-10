@@ -2,6 +2,7 @@ package com.example.photoplaces.utils
 
 import android.app.Activity
 import android.content.Context
+import android.os.SystemClock
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
@@ -15,6 +16,7 @@ import com.google.android.material.textfield.TextInputLayout
 import java.text.DecimalFormat
 
 const val FADE_ANIMATION_DURATION = 500
+const val BLOCK_IN_MILLIS = 500
 
 fun ImageView.loadImageFromUrl(url: String?) {
     val options = RequestOptions()
@@ -35,11 +37,13 @@ fun loadImage(view: ImageView, url: String?) {
 }
 
 @BindingAdapter("android:onSingleClick")
-fun View.setOnSingleClickListener(onSafeClick: () -> Unit) {
-    val singleClickListener = SingleClickListener {
-        onSafeClick()
+fun View.safeClick(listener: View.OnClickListener) {
+    var lastClickTime: Long = 0
+    this.setOnClickListener {
+        if (SystemClock.elapsedRealtime() - lastClickTime < BLOCK_IN_MILLIS) return@setOnClickListener
+        lastClickTime = SystemClock.elapsedRealtime()
+        listener.onClick(this)
     }
-    setOnClickListener(singleClickListener)
 }
 
 @BindingAdapter("isValid", "errorText")

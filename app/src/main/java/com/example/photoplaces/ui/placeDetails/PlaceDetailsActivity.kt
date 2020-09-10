@@ -2,6 +2,7 @@ package com.example.photoplaces.ui.placeDetails
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -17,14 +18,17 @@ import com.example.photoplaces.ui.newPlace.SharedViewModel
 import com.example.photoplaces.utils.Constants.NEW_PLACE_FRAGMENT_TAG
 import com.example.photoplaces.utils.Constants.PARCELABLE_CHANGED_PLACE_KEY
 import com.example.photoplaces.utils.Constants.PARCELABLE_PLACE_KEY
-import com.example.photoplaces.utils.setOnSingleClickListener
 import kotlinx.android.synthetic.main.activity_place_details.*
 
 
-class PlaceDetailsActivity : AppCompatActivity() {
+const val GOOGLE_MAPS_APP_PACKAGE = "com.google.android.apps.maps"
+
+class PlaceDetailsActivity : AppCompatActivity(), DetailsActivityButtonsActions {
 
     private lateinit var binding: ActivityPlaceDetailsBinding
-    private val sharedViewModel: SharedViewModel by lazy { ViewModelProviders.of(this).get(SharedViewModel::class.java) }
+    private val sharedViewModel: SharedViewModel by lazy {
+        ViewModelProviders.of(this).get(SharedViewModel::class.java)
+    }
     val place: Place by lazy { intent.getParcelableExtra<Place>(PARCELABLE_PLACE_KEY) }
     var placeChanged = false
 
@@ -37,10 +41,7 @@ class PlaceDetailsActivity : AppCompatActivity() {
 
         setupToolbar()
 
-        binding.editButton.setOnSingleClickListener {
-            showDialog()
-            binding.editButton.visibility = INVISIBLE
-        }
+        binding.listener = this
 
         sharedViewModel.newPlaceMutableLiveData.observe(this, Observer {
             binding.place = it
@@ -58,7 +59,7 @@ class PlaceDetailsActivity : AppCompatActivity() {
         overridePendingTransition(0, R.anim.fade_out);
         binding.editButton.visibility = VISIBLE
 
-        if(placeChanged) {
+        if (placeChanged) {
             val returnIntent = Intent().apply {
                 putExtra(PARCELABLE_CHANGED_PLACE_KEY, binding.place)
             }
@@ -90,4 +91,24 @@ class PlaceDetailsActivity : AppCompatActivity() {
             .commit()
     }
 
+    override fun onEditButtonPressed() {
+        showDialog()
+        binding.editButton.visibility = INVISIBLE
+
+    }
+
+    override fun onDirectionsButtonPressed() {
+        val gmmIntentUri = Uri.parse("geo:${place.lat},${place.lng}?q=${place.address}")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage(GOOGLE_MAPS_APP_PACKAGE)
+        mapIntent.resolveActivity(packageManager)?.let {
+            startActivity(mapIntent)
+        }
+    }
+
+}
+
+interface DetailsActivityButtonsActions {
+    fun onEditButtonPressed()
+    fun onDirectionsButtonPressed()
 }

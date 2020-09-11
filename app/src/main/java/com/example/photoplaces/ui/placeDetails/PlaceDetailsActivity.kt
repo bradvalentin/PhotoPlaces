@@ -94,7 +94,6 @@ class PlaceDetailsActivity : AppCompatActivity(), DetailsActivityButtonsActions 
     override fun onEditButtonPressed() {
         showDialog()
         binding.editButton.visibility = INVISIBLE
-
     }
 
     override fun onDirectionsButtonPressed() {

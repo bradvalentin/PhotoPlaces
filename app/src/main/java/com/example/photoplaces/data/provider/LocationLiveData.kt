@@ -12,6 +12,7 @@ import com.google.android.gms.location.LocationServices
 
 const val INTERVAL = 10000L
 const val FASTEST_INTERVAL = 5000L
+
 class LocationLiveData(context: Context) : LiveData<CurrentLocation>() {
 
     private var fusedLocationProviderClient =

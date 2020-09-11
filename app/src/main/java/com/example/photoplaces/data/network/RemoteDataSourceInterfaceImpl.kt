@@ -10,7 +10,9 @@ class RemoteDataSourceInterfaceImpl(
     private val placesApiService: PlacesApiService
 ) : RemoteDataSourceInterface {
 
-    override var downloadedPlaces: LiveData<PlacesApiResponse> = MutableLiveData<PlacesApiResponse>()
+    override var downloadedPlaces: LiveData<PlacesApiResponse> =
+        MutableLiveData<PlacesApiResponse>()
+
     private fun setDownloadedPlaces(placesApiResponse: PlacesApiResponse?) {
         (downloadedPlaces as MutableLiveData).value = placesApiResponse
     }
@@ -19,6 +21,7 @@ class RemoteDataSourceInterfaceImpl(
     private fun setDownloading(isDownloading: Boolean) {
         (downloading as MutableLiveData).value = isDownloading
     }
+
     override suspend fun fetchAllPlaces() {
         try {
             val fetchedPlaces = placesApiService.fetchAllPlaces()

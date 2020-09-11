@@ -21,6 +21,7 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
     private fun setPlaceUpdatedOrInsertedLiveData(place: Place?) {
         (placeUpdatedOrInsertedLiveData as MutableLiveData).value = place
     }
+
     val labelLiveData = MutableLiveData<String>()
     val addressLiveData = MutableLiveData<String>()
     val imageUrlLiveData = MutableLiveData<String>()
@@ -52,7 +53,8 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
 
     private fun validateLongitudeField() {
         longitudeLiveData.value?.let { longitude ->
-            longitudeFieldMediator.value = checkCoordinateFormat(longitude, MIN_VALUE_LONGITUDE, MAX_VALUE_LONGITUDE)
+            longitudeFieldMediator.value =
+                checkCoordinateFormat(longitude, MIN_VALUE_LONGITUDE, MAX_VALUE_LONGITUDE)
 
 
         } ?: run {
@@ -60,7 +62,11 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
         }
     }
 
-    private fun checkCoordinateFormat(coordinate: String, minValue: Double, maxValue: Double): Boolean {
+    private fun checkCoordinateFormat(
+        coordinate: String,
+        minValue: Double,
+        maxValue: Double
+    ): Boolean {
         return !coordinate.startsWith(DOT_TEXT) &&
                 coordinate != MINUS_TEXT &&
                 coordinate.isNotEmpty() &&
@@ -69,7 +75,8 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
 
     private fun validateLatitudeField() {
         latitudeLiveData.value?.let { latitude ->
-            latitudeFieldMediator.value = checkCoordinateFormat(latitude, MIN_VALUE_LATITUDE, MAX_VALUE_LATITUDE)
+            latitudeFieldMediator.value =
+                checkCoordinateFormat(latitude, MIN_VALUE_LATITUDE, MAX_VALUE_LATITUDE)
 
         } ?: run {
             latitudeFieldMediator.value = false
@@ -87,10 +94,14 @@ class NewPlaceFragmentViewModel(private val placesRepository: PlacesRepository) 
             formMediator.value =
                 lbl.isNotEmpty() &&
                         adr.isNotEmpty() &&
-                        checkCoordinateFormat(longitude, MIN_VALUE_LONGITUDE, MAX_VALUE_LONGITUDE) &&
+                        checkCoordinateFormat(
+                            longitude,
+                            MIN_VALUE_LONGITUDE,
+                            MAX_VALUE_LONGITUDE
+                        ) &&
                         checkCoordinateFormat(latitude, MIN_VALUE_LATITUDE, MAX_VALUE_LATITUDE)
 
-        }?: run {
+        } ?: run {
             formMediator.value = false
         }
 

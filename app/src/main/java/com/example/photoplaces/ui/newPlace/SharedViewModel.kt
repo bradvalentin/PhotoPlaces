@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.photoplaces.data.entity.Place
 
-class SharedViewModel: ViewModel() {
+class SharedViewModel : ViewModel() {
 
     val newPlaceMutableLiveData: LiveData<Place> = MutableLiveData<Place>()
 

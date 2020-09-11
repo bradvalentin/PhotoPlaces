@@ -4,7 +4,8 @@ import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
 import com.example.photoplaces.data.entity.Place
 
-class PlaceDiffCallback(private val oldList: List<Place>, private val newList: List<Place>) : DiffUtil.Callback() {
+class PlaceDiffCallback(private val oldList: List<Place>, private val newList: List<Place>) :
+    DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldList.size
 

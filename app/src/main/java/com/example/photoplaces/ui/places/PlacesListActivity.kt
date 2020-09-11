@@ -42,7 +42,8 @@ const val FLOAT_DECIMALS = 2
 const val SKELETON_VIEWS_COUNT = 10
 const val INITIAL_POSITION = -1
 
-class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener, PlacesActivityButtonsActions{
+class PlacesListActivity : AppCompatActivity(), PlaceItemClickListener,
+    PlacesActivityButtonsActions {
 
     private var position: Int = INITIAL_POSITION
 

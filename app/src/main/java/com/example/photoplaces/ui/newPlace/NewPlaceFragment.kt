@@ -20,7 +20,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class NewPlaceFragment : Fragment() {
 
     private val newPlaceViewModel: NewPlaceFragmentViewModel by viewModel()
-    private val sharedViewModel: SharedViewModel by lazy { ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java) }
+    private val sharedViewModel: SharedViewModel by lazy {
+        ViewModelProviders.of(requireActivity()).get(SharedViewModel::class.java)
+    }
 
     private lateinit var binding: FragmentPlaceDialogBinding
 

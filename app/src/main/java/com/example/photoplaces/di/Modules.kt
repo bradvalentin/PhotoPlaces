@@ -39,7 +39,7 @@ val databaseModule = module {
     }
 
     fun providePlacesDao(database: PlacesDatabase): PlacesDao {
-        return  database.placesDao()
+        return database.placesDao()
     }
 
     single { provideDatabase(androidApplication()) }
